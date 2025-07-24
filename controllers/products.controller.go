@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"nashta_inventory/dto"
 	"nashta_inventory/models"
 	"nashta_inventory/utils"
 	"net/http"
@@ -63,4 +64,43 @@ func GetAllProducts(ctx *gin.Context){
 		Results: result,
 	})
 
+}
+
+func AddNewProducts(ctx *gin.Context){
+	userId, exists := ctx.Get("userId")
+
+	if userId != "" && !exists {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized!",
+		})
+		return
+	}
+
+	req := dto.ProductRequest{}
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "Invalid Request!",
+			Errors: err.Error(),
+		})
+		return
+	}
+
+	result, err := models.CreateNewProducts(req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Failed to Add New Product!",
+			Errors: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, utils.Response{
+		Success: true,
+		Message: "Add New Product Successfully!",
+		Results: result,
+	})
 }

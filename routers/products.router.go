@@ -10,5 +10,6 @@ import (
 func productsRouter(r *gin.RouterGroup){
 	r.Use(middlewares.VerifyToken())
 	r.GET("/categories", controllers.GetAllCategories)
-	r.GET("/", controllers.GetAllProducts )
+	r.GET("", controllers.GetAllProducts )
+	r.POST("", controllers.AddNewProducts )
 }

@@ -1,3 +1,4 @@
+# REGISTER
 POST /auth/register
 Host: localhost:8080
 Content-Type: application/json
@@ -11,6 +12,7 @@ Content-Type: application/json
 }
 
 ###
+# LOGIN
 POST /auth/login
 Host: localhost:8080
 Content-Type: application/json
@@ -31,3 +33,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxM
 GET /products
 Host: localhost:8080
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
+
+### 
+# TAMBAH PRODUK
+POST /products
+Host: localhost:8080
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
+
+{
+    "name": "Laptop Asus",
+    "imageUrl": "https://image.com/laptop.jpg",
+    "purchasePrice": 5500000.00,
+    "sellingPrice": 7999000.00,
+    "quantity": 3,
+    "userId": 3,
+    "categoryId": 1
+}
