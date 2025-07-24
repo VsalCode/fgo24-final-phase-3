@@ -2,19 +2,15 @@ package models
 
 import (
 	"context"
-	"time"
+	"fmt"
 	"nashta_inventory/db"
+	"nashta_inventory/dto"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
 
-type TransactionsRequest struct {
-	ProductID      int    `json:"productId" db:"product_id" binding:"required"`
-	Type           string `json:"type" binding:"required"`
-	QuantityChange int    `json:"quantityChange" db:"quantity_change" binding:"required"`
-}
-
-type TransactionsResponse struct {
+type Transactions struct {
 	ID            int       `json:"id" db:"id"`
 	ProductName   string    `json:"productName" db:"product_name"`
 	CategoryName  string    `json:"categoryName" db:"category_name"`
@@ -26,18 +22,25 @@ type TransactionsResponse struct {
 	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
 }
 
-func AddNewTransactions(req TransactionsRequest, userId int) (*TransactionsResponse, error) {
+func AddNewTransactions(req dto.TransactionsRequest, userId int) (*Transactions, error) {
 	conn, err := db.DBConnect()
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
-	tx, err := conn.Begin(context.Background())
-	if err != nil {
-		return nil, err
+	if req.Type == "out" || req.Type == "OUT" {
+		var currentStock int
+		stockQuery := `SELECT quantity FROM products WHERE id = $1`
+		err = conn.QueryRow(context.Background(), stockQuery, req.ProductID).Scan(&currentStock)
+		if err != nil {
+			return nil, fmt.Errorf("product not found!")
+		}
+
+		if currentStock < req.QuantityChange {
+			return nil, fmt.Errorf("stock: available %d, requested %d", currentStock, req.QuantityChange)
+		}
 	}
-	defer tx.Rollback(context.Background())
 
 	var trxId int
 	insertQuery := `
@@ -45,12 +48,12 @@ func AddNewTransactions(req TransactionsRequest, userId int) (*TransactionsRespo
 		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
-	err = tx.QueryRow(
+	err = conn.QueryRow(
 		context.Background(),
 		insertQuery,
 		req.ProductID, userId, req.Type, req.QuantityChange).Scan(&trxId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to insert transaction: %v", err)
 	}
 
 	var updateQuery string
@@ -68,12 +71,12 @@ func AddNewTransactions(req TransactionsRequest, userId int) (*TransactionsRespo
 			WHERE id = $2
 		`
 	default:
-		return nil, err
+		return nil, fmt.Errorf("invalid transaction type: %s", req.Type)
 	}
 
-	_, err = tx.Exec(context.Background(), updateQuery, req.QuantityChange, req.ProductID)
+	_, err = conn.Exec(context.Background(), updateQuery, req.QuantityChange, req.ProductID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update product quantity: %v", err)
 	}
 
 	joinQuery := `
@@ -93,72 +96,16 @@ func AddNewTransactions(req TransactionsRequest, userId int) (*TransactionsRespo
 		WHERE t.id = $1
 	`
 
-	rows, err := tx.Query(context.Background(), joinQuery, trxId)
+	rows, err := conn.Query(context.Background(), joinQuery, trxId)
 	if err != nil {
-		return nil, err
-	}
-
-	result, err := pgx.CollectOneRow[TransactionsResponse](rows, pgx.RowToStructByName)
-
-	err = tx.Commit(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
-}
-
-func GetTransactionHistory(productId int, limit, offset int) ([]*TransactionsResponse, error) {
-	conn, err := db.DBConnect()
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-
-	query := `
-		SELECT 
-			t.id,
-			p.name AS product_name,
-			pc.name AS category_name,
-			t.type,
-			t.quantity_change,
-			p.purchase_price,
-			p.selling_price,
-			p.quantity AS stock,
-			t.created_at
-		FROM transactions t
-		JOIN products p ON p.id = t.product_id
-		JOIN product_categories pc ON pc.id = p.category_id
-		WHERE t.product_id = $1
-		ORDER BY t.created_at DESC
-		LIMIT $2 OFFSET $3
-	`
-
-	rows, err := conn.Query(context.Background(), query, productId, limit, offset)
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query transaction result: %v", err)
 	}
 	defer rows.Close()
 
-	var transactions []*TransactionsResponse
-	for rows.Next() {
-		var t TransactionsResponse
-		err := rows.Scan(
-			&t.ID,
-			&t.ProductName,
-			&t.CategoryName,
-			&t.Type,
-			&t.QuantityChange,
-			&t.PurchasePrice,
-			&t.SellingPrice,
-			&t.Stock,
-			&t.CreatedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-		transactions = append(transactions, &t)
+	result, err := pgx.CollectOneRow[Transactions](rows, pgx.RowToStructByName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect transaction result: %v", err)
 	}
 
-	return transactions, nil
+	return &result, nil
 }

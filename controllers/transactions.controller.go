@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"nashta_inventory/dto"
 	"nashta_inventory/models"
 	"nashta_inventory/utils"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 func GoodsMovement(ctx *gin.Context) {
 	userId, exists := ctx.Get("userId")
 
-	if userId != "" && !exists {
+	if userId == "" && !exists {
 		ctx.JSON(http.StatusUnauthorized, utils.Response{
 			Success: false,
 			Message: "Unauthorized!",
@@ -21,7 +22,7 @@ func GoodsMovement(ctx *gin.Context) {
 		return
 	}
 
-	req := models.TransactionsRequest{}
+	req := dto.TransactionsRequest{}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
