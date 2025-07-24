@@ -6,4 +6,5 @@ import (
 
 func CombineRouters(r *gin.Engine){
 	authRouters(r.Group("/auth"))
+	productsRouter(r.Group("/products"))
 }
