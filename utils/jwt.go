@@ -1,12 +1,15 @@
-package utils;
+package utils
 
 import (
-	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 )
 
 func GenerateToken(userId int) (string, error) {
+	godotenv.Load()
 
 	expirationTime := time.Now().Add(12 * time.Hour)
 	claims := jwt.MapClaims{
@@ -16,6 +19,6 @@ func GenerateToken(userId int) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	secretKey := os.Getenv("APP_SECRET")
+	secretKey := os.Getenv("SECRET_KEY")
 	return token.SignedString([]byte(secretKey))
 }
