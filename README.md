@@ -6,21 +6,45 @@
     R --> B[/User Login/]
     B --> C{Valid?}
     C -->|No| R
-    C -->|Yes| D[Pilih Operasi]
-    D --> E[/Lihat Stok Produk/]
-    D --> F[/Transaksi Baru/]
-    F --> G{Type?}
-    G -->|IN| H[/Input Stok Masuk/]
-    G -->|OUT| I[/Input Stok Keluar/]
-    H --> J[Update Quantity]
-    I --> K{Stok Cukup?}
-    K -->|No| L[/Tolak Transaksi/]
-    K -->|Yes| J
-    J --> M[Catat Transaksi]
-    M --> N[Update Stok Produk]
-    N --> O[/Tampilkan Laporan/]
-    O --> P((end))
-    E --> P
+    C -->|Yes| D[Dashboard - Pilih Menu]
+    
+    D --> E[/Lihat Produk/]
+    D --> F[/Lihat Categories/]
+    D --> G[/Tambah Produk/]
+    D --> H[/Transaksi IN/OUT/]
+    D --> I[/Lihat History Transaksi/]
+    
+    E --> E1[/Tampilkan Daftar Produk/]
+    E1 --> D
+    
+    F --> F1[/Tampilkan Daftar Categories/]
+    F1 --> D
+    
+    G --> G1[/Input Data Produk Baru/]
+    G1 --> G2[Simpan Produk ke Database]
+    G2 --> G3[Catat Transaksi IN Otomatis]
+    G3 --> G4[/Produk Berhasil Ditambah/]
+    G4 --> D
+    
+    H --> H1{Pilih Tipe Transaksi}
+    H1 -->|IN| H2[/Input Stok Masuk/]
+    H1 -->|OUT| H3[/Input Stok Keluar/]
+    
+    H2 --> H4[Update Quantity +]
+    H3 --> H5{Stok Cukup?}
+    H5 -->|No| H6[/Tolak Transaksi - Stok Tidak Cukup/]
+    H5 -->|Yes| H7[Update Quantity -]
+    
+    H4 --> H8[Catat Transaksi]
+    H7 --> H8
+    H8 --> H9[Update Stok Produk]
+    H9 --> H10[/Transaksi Berhasil/]
+    H10 --> D
+    H6 --> D
+    
+    I --> I1[/Tampilkan History Transaksi/]
+    
+    D --> Y((End))
 ```
 
 # ERD
@@ -37,7 +61,7 @@ erDiagram
         updated_at timestamp
     }
 
-    product_categorys {
+    product_categories {
         id int PK
         name string
         description string
@@ -70,7 +94,7 @@ erDiagram
     }
 
     users ||--o{ products : "creates"
-    product_categorys ||--o{ products : "contains"
+    product_categories ||--o{ products : "contains"
     users ||--o{ transactions : "performs"
     products ||--o{ transactions : "has"
 ```
