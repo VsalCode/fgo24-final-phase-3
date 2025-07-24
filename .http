@@ -41,11 +41,21 @@ Host: localhost:8080
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
 
 {
-    "name": "Laptop Asus",
-    "imageUrl": "https://image.com/laptop.jpg",
-    "purchasePrice": 5500000.00,
-    "sellingPrice": 7999000.00,
-    "quantity": 3,
+    "name": "Kaos Airism",
+    "imageUrl": "https://tshirt.com/airism.jpg",
+    "purchasePrice": 99000.00,
+    "sellingPrice": 125000.00,
+    "quantity": 7,
     "userId": 3,
-    "categoryId": 1
+    "categoryId": 4
 }
+
+# {
+#     "name": "Laptop Asus",
+#     "imageUrl": "https://image.com/laptop.jpg",
+#     "purchasePrice": 5500000.00,
+#     "sellingPrice": 7999000.00,
+#     "quantity": 3,
+#     "userId": 3,
+#     "categoryId": 1
+# }

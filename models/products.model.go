@@ -74,7 +74,7 @@ func FindAllProducts() ([]Categories, error) {
 	return categories, nil
 }
 
-func CreateNewProducts(req dto.ProductRequest) (Products, error) {
+func CreateNewProducts(req dto.ProductRequest, userId int) (Products, error) {
 	conn, err := db.DBConnect()
 	if err != nil {
 		return Products{}, err
@@ -98,7 +98,7 @@ func CreateNewProducts(req dto.ProductRequest) (Products, error) {
 		context.Background(), 
 		query, 
 		code, req.Name, req.ImageURL, req.PurchasePrice, req.SellingPrice, req.Quantity, 
-		req.UserId, req.CategoryId).Scan(&productId)
+		userId, req.CategoryId).Scan(&productId)
 	if err != nil {
 		return Products{}, err
 	}
