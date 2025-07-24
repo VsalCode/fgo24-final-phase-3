@@ -98,16 +98,6 @@ func AddNewProducts(ctx *gin.Context){
 		return
 	}
 
-	err = models.RecordTransaction(result.Id, userId.(int), "IN", result.Quantity)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.Response{
-			Success: false,
-			Message: "Failed add to transactions!",
-			Errors: err.Error(),
-		})
-		return
-	}
-
 	ctx.JSON(http.StatusCreated, utils.Response{
 		Success: true,
 		Message: "Add New Product Successfully!",

@@ -81,44 +81,96 @@ func CreateNewProducts(req dto.ProductRequest, userId int) (Products, error) {
 	}
 	defer conn.Close()
 
+	tx, err := conn.Begin(context.Background())
+	if err != nil {
+		return Products{}, err
+	}
+	defer tx.Rollback(context.Background()) 
+
 	id, err := gonanoid.New(6)
 	if err != nil {
 		return Products{}, err
 	}
-	code := fmt.Sprintf("PRDK-%s", id)
+	code := fmt.Sprintf("BRG-%s", id)
 
-	query := `
-	INSERT INTO products (code_product, name, image_url, purchase_price, selling_price, quantity, user_id, category_id)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	insertQuery := `
+	INSERT INTO products (
+		code_product, name, image_url, 
+		purchase_price, selling_price, 
+		quantity, user_id, category_id
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	RETURNING id
 	`
 
 	var productId int
-	err = conn.QueryRow(
-		context.Background(), 
-		query, 
-		code, req.Name, req.ImageURL, req.PurchasePrice, req.SellingPrice, req.Quantity, 
-		userId, req.CategoryId).Scan(&productId)
+	err = tx.QueryRow(
+		context.Background(),
+		insertQuery,
+		code, 
+		req.Name, 
+		req.ImageURL, 
+		req.PurchasePrice, 
+		req.SellingPrice, 
+		req.Quantity, 
+		userId, 
+		req.CategoryId,
+	).Scan(&productId)
+	
 	if err != nil {
 		return Products{}, err
 	}
 
-	querySelect := `
-	SELECT p.id, p.code_product, p.name, p.image_url, p.purchase_price, p.selling_price, p.quantity, u.name as user, pc.name as category
+	trxQuery := `
+	INSERT INTO transactions (
+		product_id, user_id, 
+		type, quantity_change
+	) VALUES ($1, $2, $3, $4)
+	`
+
+	_, err = tx.Exec(
+		context.Background(),
+		trxQuery,
+		productId, 
+		userId, 
+		"IN", 
+		req.Quantity, 
+	)
+	
+	if err != nil {
+		return Products{}, err
+	}
+
+	selectQuery := `
+	SELECT 
+		p.id, p.code_product, p.name, 
+		p.image_url, p.purchase_price, 
+		p.selling_price, p.quantity,
+		u.name AS user,
+		pc.name AS category
 	FROM products p
 	JOIN users u ON u.id = p.user_id
-	JOIN product_categories pc ON pc.id = p.category_id  
+	JOIN product_categories pc ON pc.id = p.category_id
 	WHERE p.id = $1
 	`
-	row, err := conn.Query(context.Background(), querySelect, productId)
+
+	row, err := tx.Query(
+		context.Background(),
+		selectQuery,
+		productId,
+	)
+
 	if err != nil {
 		return Products{}, err
 	}
 
-	result, err := pgx.CollectOneRow[Products](row, pgx.RowToStructByName)
+	product, err := pgx.CollectOneRow[Products](row, pgx.RowToStructByName)
 	if err != nil {
 		return Products{}, err
 	}
 
-	return result, nil
+	if err := tx.Commit(context.Background()); err != nil {
+		return Products{}, err
+	}
+
+	return product, nil
 }
