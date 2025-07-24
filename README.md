@@ -27,7 +27,7 @@
 
 ```mermaid
 erDiagram
-    user {
+    users {
         id int PK
         name string
         email string UK
@@ -37,7 +37,7 @@ erDiagram
         updated_at timestamp
     }
 
-    product_category {
+    product_categorys {
         id int PK
         name string
         description string
@@ -45,7 +45,7 @@ erDiagram
         updated_at timestamp
     }
 
-    product {
+    products {
         id int PK
         code_product string UK
         name string
@@ -59,7 +59,7 @@ erDiagram
         updated_at timestamp
     }
 
-    transaction {
+    transactions {
         id int PK
         product_id int FK
         user_id int FK
@@ -69,8 +69,8 @@ erDiagram
         updated_at timestamp
     }
 
-    user ||--o{ product : "creates"
-    product_category ||--o{ product : "contains"
-    user ||--o{ transaction : "performs"
-    product ||--o{ transaction : "has"
+    users ||--o{ products : "creates"
+    product_categorys ||--o{ products : "contains"
+    users ||--o{ transactions : "performs"
+    products ||--o{ transactions : "has"
 ```
