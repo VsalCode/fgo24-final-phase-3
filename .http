@@ -3,8 +3,18 @@ Host: localhost:8080
 Content-Type: application/json
 
 {
-  "name": "test@gmail.com",
-  "email": "test",
-  "password": "test123",
+  "name": "test",
+  "email": "test@gmail.com",
+  "password": "test12345",
   "phone": "08192674757"
+}
+
+###
+POST /auth/login
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "email": "test@gmail.com",
+  "password": "test123"
 }

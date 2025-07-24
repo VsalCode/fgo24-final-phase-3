@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Register(ctx *gin.Context){
+func Register(ctx *gin.Context) {
 	req := models.RegisterRequest{}
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
 			Succcess: false,
-			Message: "Invalid Request!",
+			Message:  "Invalid Request!",
 		})
 		return
 	}
@@ -23,14 +23,42 @@ func Register(ctx *gin.Context){
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.Response{
 			Succcess: false,
-			Message: "Failed to register",
-			Errors: err.Error(),
+			Message:  "Failed to register",
+			Errors:   err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, utils.Response{
 		Succcess: true,
-		Message: "Register Successfully!",
+		Message:  "Register Successfully!",
+	})
+}
+
+func Login(ctx *gin.Context) {
+	req := models.LoginRequest{}
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.Response{
+			Succcess: false,
+			Message:  "Invalid Request!",
+		})
+		return
+	}
+
+	result, err := models.ValidateLogin(req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Succcess:false,
+			Message: "Failed to login!",
+			Errors: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Succcess: true,
+		Message:  "Login Successfully!",
+		Results:  result,
 	})
 }
