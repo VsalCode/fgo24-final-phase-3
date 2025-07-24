@@ -10,4 +10,5 @@ import (
 func transactionsRouter(r *gin.RouterGroup){
 	r.Use(middlewares.VerifyToken())
 	r.POST("", controllers.GoodsMovement)
+	r.GET("", controllers.HistoryTransactions)
 }

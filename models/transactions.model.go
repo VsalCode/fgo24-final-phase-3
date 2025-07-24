@@ -22,6 +22,22 @@ type Transactions struct {
 	CreatedAt     time.Time `json:"createdAt" db:"created_at"`
 }
 
+
+type TransactionsHistory struct {
+	ID                   int       `json:"id" db:"id"`
+	ProductName          string    `json:"namaBarang" db:"product_name"`
+	CategoryName         string    `json:"kategoriBarang" db:"category_name"`
+	BarangMasuk          int       `json:"barangMasuk" db:"barang_masuk"`
+	BarangKeluar         int       `json:"barangKeluar" db:"barang_keluar"`
+	HargaBeli            float64   `json:"hargaBeli" db:"purchase_price"`
+	HargaJual            float64   `json:"hargaJual" db:"selling_price"`
+	TotalHargaPembelian  float64   `json:"totalHargaPembelian" db:"total_harga_pembelian"`
+	TotalHargaPenjualan  float64   `json:"totalHargaPenjualan" db:"total_harga_penjualan"`
+	StokTersedia         int       `json:"stokTersedia" db:"quantity"`
+	CreatedAt            time.Time `json:"createdAt" db:"created_at"`
+}
+
+
 func AddNewTransactions(req dto.TransactionsRequest, userId int) (*Transactions, error) {
 	conn, err := db.DBConnect()
 	if err != nil {
@@ -108,4 +124,44 @@ func AddNewTransactions(req dto.TransactionsRequest, userId int) (*Transactions,
 	}
 
 	return &result, nil
+}
+
+func GetTransactionHistory() ([]TransactionsHistory, error) {
+	conn, err := db.DBConnect()
+	if err != nil {
+		return []TransactionsHistory{}, err
+	}
+	defer conn.Close()
+
+	query := `
+		SELECT 
+			t.id,
+			p.name AS product_name,
+			pc.name AS category_name,
+			CASE WHEN t.type = 'IN' THEN t.quantity_change ELSE 0 END AS barang_masuk,
+			CASE WHEN t.type = 'OUT' THEN t.quantity_change ELSE 0 END AS barang_keluar,
+			p.purchase_price,
+			p.selling_price,
+			CASE WHEN t.type = 'IN' THEN (t.quantity_change * p.purchase_price) ELSE 0 END AS total_harga_pembelian,
+			CASE WHEN t.type = 'OUT' THEN (t.quantity_change * p.selling_price) ELSE 0 END AS total_harga_penjualan,
+			p.quantity,
+			t.created_at
+		FROM transactions t
+		JOIN products p ON p.id = t.product_id
+		JOIN product_categories pc ON pc.id = p.category_id
+		ORDER BY t.created_at DESC
+	`
+
+	rows, err := conn.Query(context.Background(), query)
+	if err != nil {
+		return []TransactionsHistory{}, err
+	}
+	defer rows.Close()
+
+	transactions, err := pgx.CollectRows(rows, pgx.RowToStructByName[TransactionsHistory])
+	if err != nil {
+		return []TransactionsHistory{}, err
+	}
+
+	return transactions, nil
 }

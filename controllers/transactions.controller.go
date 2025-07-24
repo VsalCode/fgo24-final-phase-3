@@ -54,3 +54,31 @@ func GoodsMovement(ctx *gin.Context) {
 		Results: result,
 	})
 }
+
+func HistoryTransactions(ctx *gin.Context){
+	userId, exists := ctx.Get("userId")
+
+	if userId == "" && !exists {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized!",
+		})
+		return
+	}
+
+	results, err := models.GetTransactionHistory()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Failed to get history transactions!",
+			Errors: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Success: true,
+		Message: "Get Transaction History Successfully!",
+		Results: results,
+	})
+}
