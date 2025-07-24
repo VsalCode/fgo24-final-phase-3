@@ -13,7 +13,7 @@ func Register(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
-			Succcess: false,
+			Success: false,
 			Message:  "Invalid Request!",
 		})
 		return
@@ -22,7 +22,7 @@ func Register(ctx *gin.Context) {
 	err = models.CreateNewUser(req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.Response{
-			Succcess: false,
+			Success: false,
 			Message:  "Failed to register",
 			Errors:   err.Error(),
 		})
@@ -30,7 +30,7 @@ func Register(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, utils.Response{
-		Succcess: true,
+		Success: true,
 		Message:  "Register Successfully!",
 	})
 }
@@ -40,7 +40,7 @@ func Login(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
-			Succcess: false,
+			Success: false,
 			Message:  "Invalid Request!",
 		})
 		return
@@ -49,7 +49,7 @@ func Login(ctx *gin.Context) {
 	result, err := models.ValidateLogin(req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.Response{
-			Succcess:false,
+			Success:false,
 			Message: "Failed to login!",
 			Errors: err.Error(),
 		})
@@ -57,7 +57,7 @@ func Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, utils.Response{
-		Succcess: true,
+		Success: true,
 		Message:  "Login Successfully!",
 		Results:  result,
 	})
