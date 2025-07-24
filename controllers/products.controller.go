@@ -35,3 +35,32 @@ func GetAllCategories(ctx *gin.Context){
 	})
 
 }
+
+func GetAllProducts(ctx *gin.Context){
+	userId, exists := ctx.Get("userId")
+
+	if userId != "" && !exists {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized!",
+		})
+		return
+	}
+
+	result, err := models.FindAllProducts() 
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Failed To Get All Products!",
+			Errors: err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Success: true,
+		Message: "Get All Products Successfully!",
+		Results: result,
+	})
+
+}

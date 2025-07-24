@@ -25,3 +25,9 @@ Content-Type: application/json
 GET /products/categories
 Host: localhost:8080
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
+
+###
+
+GET /products
+Host: localhost:8080
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
