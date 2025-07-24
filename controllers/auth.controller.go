@@ -56,9 +56,19 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
+	token, err := utils.GenerateToken(result.Id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Failed to generate token",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, utils.Response{
 		Success: true,
 		Message:  "Login Successfully!",
-		Results:  result,
+		Results:  token,
 	})
 }
