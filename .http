@@ -1,0 +1,10 @@
+POST /auth/register
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "test@gmail.com",
+  "email": "test",
+  "password": "test123",
+  "phone": "08192674757"
+}
