@@ -12,7 +12,7 @@ import (
 func GetAllCategories(ctx *gin.Context){
 	userId, exists := ctx.Get("userId")
 
-	if userId != "" && !exists {
+	if userId == "" && !exists {
 		ctx.JSON(http.StatusUnauthorized, utils.Response{
 			Success: false,
 			Message: "Unauthorized!",
@@ -40,7 +40,7 @@ func GetAllCategories(ctx *gin.Context){
 func GetAllProducts(ctx *gin.Context){
 	userId, exists := ctx.Get("userId")
 
-	if userId != "" && !exists {
+	if userId == "" && !exists {
 		ctx.JSON(http.StatusUnauthorized, utils.Response{
 			Success: false,
 			Message: "Unauthorized!",
@@ -69,7 +69,7 @@ func GetAllProducts(ctx *gin.Context){
 func AddNewProducts(ctx *gin.Context){
 	userId, exists := ctx.Get("userId")
 
-	if userId != "" && !exists {
+	if userId == "" && !exists {
 		ctx.JSON(http.StatusUnauthorized, utils.Response{
 			Success: false,
 			Message: "Unauthorized!",
