@@ -1,0 +1,1 @@
+ALTER TABLE product_categories RENAME TO product_categorys;
