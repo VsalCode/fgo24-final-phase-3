@@ -39,13 +39,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxM
 POST /products
 Host: localhost:8080
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
+Content-Type: application/json
 
 {
-    "name": "Kaos Airism",
-    "imageUrl": "https://tshirt.com/airism.jpg",
-    "purchasePrice": 99000.00,
-    "sellingPrice": 125000.00,
-    "quantity": 7,
+    "name": "Kemeja Uniqlo",
+    "imageUrl": "https://uniqlo.com/kemeja.jpg",
+    "purchasePrice": 110000.00,
+    "sellingPrice": 150000.00,
+    "quantity": 10,
     "userId": 3,
     "categoryId": 4
 }
@@ -59,3 +60,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxM
 #     "userId": 3,
 #     "categoryId": 1
 # }
+
+###
+# TAMBAH TRANSAKSI
+
+POST /transactions
+Host: localhost:8080
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTM0MTMxMzcsImlhdCI6MTc1MzM2OTkzNywidXNlcklkIjozfQ.f_YVEH0bBFLGUYFTCDgo5OMn1h93Ld1jf2f-I3Hd6y4
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "type": "OUT",
+  "quantityChange": 4
+}
