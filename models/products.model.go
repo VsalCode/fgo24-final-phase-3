@@ -23,10 +23,11 @@ type Products struct {
 	ImageURL      string  `json:"imageUrl" db:"image_url"`
 	PurchasePrice float64 `json:"purchasePrice" db:"purchase_price"`
 	SellingPrice  float64 `json:"sellingPrice" db:"selling_price"`
-	Quantity      int     `json:"quantity"`
-	User          string  `json:"user"`
-	Category      string  `json:"categories"`
+	Quantity      int     `json:"quantity"` 
+	User          string  `json:"user,omitempty" db:"user"` 
+	Category      string  `json:"categories,omitempty" db:"category"`
 }
+
 
 func FindAllCategories() ([]Categories, error) {
 	conn, err := db.DBConnect()
@@ -49,29 +50,34 @@ func FindAllCategories() ([]Categories, error) {
 	return categories, nil
 }
 
-func FindAllProducts() ([]Categories, error) {
+func FindAllProducts() ([]Products, error) {
 	conn, err := db.DBConnect()
 	if err != nil {
-		return []Categories{}, err
+		return []Products{}, err
 	}
 	defer conn.Close()
 
 	query := `
-	SELECT p.id, p.code_product, p.name, p.image_url, p.purchase_price, p.selling_price, p.user_id 
+	SELECT 
+		p.id, p.code_product, p.name, p.image_url, 
+		p.purchase_price, p.selling_price, p.quantity, 
+		u.name AS user, 
+		pc.name AS category 
 	FROM products p 
 	LEFT JOIN product_categories pc ON pc.id = p.category_id
+	LEFT JOIN users u ON u.id = p.user_id 
 	`
 	rows, err := conn.Query(context.Background(), query)
 	if err != nil {
-		return []Categories{}, err
+		return []Products{}, err
 	}
 
-	categories, err := pgx.CollectRows[Categories](rows, pgx.RowToStructByName)
+	products, err := pgx.CollectRows[Products](rows, pgx.RowToStructByName) // Changed categories to products for clarity
 	if err != nil {
-		return []Categories{}, err
+		return []Products{}, err
 	}
 
-	return categories, nil
+	return products, nil
 }
 
 func CreateNewProducts(req dto.ProductRequest, userId int) (Products, error) {
